@@ -61,6 +61,7 @@ def opt(bot, update):
         if str(msg)==str(opts[cont]) and len(urls)!=0:
             #print(update.message.text)
             os.system(' scdl -l https://soundcloud.com'+str(urls[cont])+' --path C:\BotMusic')
+            bot.send_message(chat_id=update.message.chat_id, text="Carregando musica por favor aguarde")
             try:
                 bot.send_audio(chat_id=update.message.chat_id, audio=open('C:/BotMusic/'+musicas[cont]+'.mp3', 'rb'), timeout=50000)
             except:
