@@ -47,7 +47,7 @@ def pesquisar(bot, update, args):
         artista=artista.split('/')
         #print(str(cont+1)+"-"+artista[1]+" - "+musicas[cont])
         bot.send_message(chat_id=update.message.chat_id, text=str(cont+1)+"-"+artista[1]+" - "+musicas[cont])
-        bot.send_message(chat_id=update.message.chat_id, text="Digite um numero correspondente a musica desejada")
+    bot.send_message(chat_id=update.message.chat_id, text="Digite um numero correspondente a musica desejada")
     
 
 def opt(bot, update):
