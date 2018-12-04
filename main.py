@@ -6,6 +6,8 @@ import requests
 from bs4 import BeautifulSoup
 import scdl
 import os
+from random import *
+from google_images_download import google_images_download
 
 updater = Updater(token='621576630:AAGBjQdLZtnc-AJoVSGaW2OEjQZ58trWn5E')
 dispatcher = updater.dispatcher
@@ -15,17 +17,16 @@ musicas=[]
 global urls
 urls=[]
 
+
 def start(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="Bem vindo ao sound cloud player bot")
     bot.send_message(chat_id=update.message.chat_id, text="digite /pesquisar + nome da musica para pesquisar por musicas")
-    
 def pesquisar(bot, update, args):
     global musicas
     musicas=[]
     global urls
     urls=[]
     user_says = " ".join(args)
-    
     if user_says != "":
         update.message.reply_text("Você pesquisou por: " + user_says)
         url = "https://soundcloud.com/search/sounds?q="+str(user_says)
@@ -45,11 +46,9 @@ def pesquisar(bot, update, args):
     for cont in range(0,10):
         artista=urls[cont]
         artista=artista.split('/')
-        #print(str(cont+1)+"-"+artista[1]+" - "+musicas[cont])
         bot.send_message(chat_id=update.message.chat_id, text=str(cont+1)+"-"+artista[1]+" - "+musicas[cont])
-    bot.send_message(chat_id=update.message.chat_id, text="Digite um numero correspondente a musica desejada")
+    bot.send_message(chat_id=update.message.chat_id, text="Digite um numero correspondente a musica desejada:")
     
-
 def opt(bot, update):
     print(update.message.text)
     global urls
@@ -59,26 +58,30 @@ def opt(bot, update):
     msg=update.message.text
     for cont in range(0,10):
         if str(msg)==str(opts[cont]) and len(urls)!=0:
-            #print(update.message.text)
             os.system(' scdl -l https://soundcloud.com'+str(urls[cont])+' --path C:\BotMusic')
             bot.send_message(chat_id=update.message.chat_id, text="Carregando musica por favor aguarde")
             try:
+                response = google_images_download.googleimagesdownload()
+                arguments={"keywords":musicas[cont],"limit":1,"output_directory":"C:\\imgs"}
+                paths = response.download(arguments)
+                a=str(paths)
+                new=''
+                y=2
+                while a[y] != "'" and a[y+1]!= ":":
+                    new=new+a[y]
+                    y=y+1
+                bot.send_photo(chat_id=update.message.chat_id, photo=open('C:/imgs/'+new+'/1. maxresdefault.jpg', 'rb'))
                 bot.send_audio(chat_id=update.message.chat_id, audio=open('C:/BotMusic/'+musicas[cont]+'.mp3', 'rb'), timeout=50000)
+                bot.send_message(chat_id=update.message.chat_id, text="Pronto! Digite /pesquisar para buscar outra musica")
             except:
                 bot.send_message(chat_id=update.message.chat_id, text="Não foi possivel enviar a musica, por favor tente novamente ou selecione outra musica")
-                #os.rename('C:/BotMusic/'+musicas[cont]+'.mp3','C:/BotMusic/semTitulo.mp3')
-                #bot.send_audio(chat_id=update.message.chat_id, audio=open('C:/BotMusic/semTitulo.mp3', 'rb'), timeout=50000)
-                #os.remove('C:/BotMusic/semTitulo.mp3')
-
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
 dispatcher.add_handler(CommandHandler("pesquisar", pesquisar, pass_args=True))
-
 opt_handler = MessageHandler(Filters.text, opt)
 dispatcher.add_handler(opt_handler)
 
 updater.start_polling()
-
 
